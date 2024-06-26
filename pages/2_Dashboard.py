@@ -66,7 +66,7 @@ month_list = pd.date_range(start=earliest_month, end=current_month, freq='MS').s
 current_week = pd.Timestamp.now().isocalendar().week
 
 @st.cache_data
-def extract_data(list_of_month):
+def extract_data():
     extracted_df = pd.DataFrame()
 
     for ym in month_list:
@@ -90,7 +90,7 @@ def extract_data(list_of_month):
     return extracted_df
 
 
-agg_data = extract_data(month_list)
+agg_data = extract_data()
 last_year_agg_data = pd.read_excel("data/ayam_telur_price_2023.xlsx")
 
 # curyearweekly = agg_data(rawdata, unit='weekly')
