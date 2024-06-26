@@ -28,31 +28,35 @@ background: rgba(0,0,0,0);
 """
 st.markdown(page_bg_img, unsafe_allow_html=True)
 
-
-## premise lookup codes
-premise_url = 'https://storage.data.gov.my/pricecatcher/lookup_premise.parquet'
-
-lookup_premise = pd.read_parquet(premise_url)
-if 'date' in lookup_premise.columns: lookup_premise['date'] = pd.to_datetime(lookup_premise['date'])
-# lookup_premise = pd.read_csv("./data/lookup_premise.csv")
-lookup_premise = lookup_premise.dropna()
-premise_type_list = ['Borong', 'Hypermarket', 'Kedai Runcit', 'Pasar Basah', 'Pasar Basah ', 'Pasar Mini', 'Pasar Raya / Supermarket']
-lookup_premise = lookup_premise.loc[lookup_premise['premise_type'].isin(premise_type_list)]
-list_state = sorted(lookup_premise['state'].unique())
-
-# lookup item
-# item_url = 'https://storage.data.gov.my/pricecatcher/lookup_item.parquet'
-# item_df = pd.read_parquet(item_url)
-# if 'date' in item_df.columns: item_df['date'] = pd.to_datetime(item_df['date'])
-# item_df = item_df.dropna()
-
-# only takes telur and ayam products
-# lookup_item = item_df.loc[(item_df['item_category'].isin(['TELUR','AYAM'])) & (item_df['item_group'] == 'BARANGAN SEGAR')]
-lookup_item = pd.read_csv("./data/lookup_item.csv")
-
-lookup_item['item_unit'] = lookup_item['item'].astype(str) + " (" + lookup_item['unit'].astype(str) + ")"
-lookup_item = lookup_item.sort_values(by=['item_unit'])
-list_item = lookup_item['item_unit'].unique()
+@st.cache_data
+def premise_lookup():
+    ## premise lookup codes
+    premise_url = 'https://storage.data.gov.my/pricecatcher/lookup_premise.parquet'
+    
+    lookup_premise = pd.read_parquet(premise_url)
+    if 'date' in lookup_premise.columns: lookup_premise['date'] = pd.to_datetime(lookup_premise['date'])
+    # lookup_premise = pd.read_csv("./data/lookup_premise.csv")
+    lookup_premise = lookup_premise.dropna()
+    premise_type_list = ['Borong', 'Hypermarket', 'Kedai Runcit', 'Pasar Basah', 'Pasar Basah ', 'Pasar Mini', 'Pasar Raya / Supermarket']
+    lookup_premise = lookup_premise.loc[lookup_premise['premise_type'].isin(premise_type_list)]
+    list_state = sorted(lookup_premise['state'].unique())
+    
+    # lookup item
+    # item_url = 'https://storage.data.gov.my/pricecatcher/lookup_item.parquet'
+    # item_df = pd.read_parquet(item_url)
+    # if 'date' in item_df.columns: item_df['date'] = pd.to_datetime(item_df['date'])
+    # item_df = item_df.dropna()
+    
+    # only takes telur and ayam products
+    # lookup_item = item_df.loc[(item_df['item_category'].isin(['TELUR','AYAM'])) & (item_df['item_group'] == 'BARANGAN SEGAR')]
+    lookup_item = pd.read_csv("./data/lookup_item.csv")
+    
+    lookup_item['item_unit'] = lookup_item['item'].astype(str) + " (" + lookup_item['unit'].astype(str) + ")"
+    lookup_item = lookup_item.sort_values(by=['item_unit'])
+    list_item = lookup_item['item_unit'].unique()
+    return list_state, list_item, lookup_premise, lookup_item
+    
+list_state, list_item, lookup_premise, lookup_item = premise_lookup()
 
 # date settings
 earliest_month = pd.Timestamp.now().strftime("%Y-01-01")
@@ -61,6 +65,7 @@ last_month = (pd.Timestamp.now() - dateutil.relativedelta.relativedelta(months=1
 month_list = pd.date_range(start=earliest_month, end=current_month, freq='MS').strftime("%Y-%m")
 current_week = pd.Timestamp.now().isocalendar().week
 
+@st.cache_data
 def extract_data(list_of_month):
     extracted_df = pd.DataFrame()
 
