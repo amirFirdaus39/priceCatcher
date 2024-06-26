@@ -65,7 +65,7 @@ last_month = (pd.Timestamp.now() - dateutil.relativedelta.relativedelta(months=1
 month_list = pd.date_range(start=earliest_month, end=current_month, freq='MS').strftime("%Y-%m")
 current_week = pd.Timestamp.now().isocalendar().week
 
-@st.cache_data
+#@st.cache_data
 def extract_data(list_of_month):
     extracted_df = pd.DataFrame()
 
