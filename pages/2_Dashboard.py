@@ -82,7 +82,7 @@ def extract_data(list_of_month):
 
 
 agg_data = extract_data(month_list)
-last_year_agg_data = pd.read_excel("./data/ayam_telur_price_2023.xlsx")
+last_year_agg_data = pd.read_excel("data/ayam_telur_price_2023.xlsx")
 
 # curyearweekly = agg_data(rawdata, unit='weekly')
 # curyearmonthly = agg_data(rawdata, unit='monthly')
